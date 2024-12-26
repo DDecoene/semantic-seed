@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, ArrowDown, GripVertical } from 'lucide-react';
-import { categoryNames } from '@/lib/word-lists';
 
 interface SentenceStructureProps {
   structure: string[];
+  categoryNames: { [key: string]: string };
   onRemoveCategory: (index: number) => void;
   onClearStructure: () => void;
   onDragStart: (e: React.DragEvent, index: number) => void;
@@ -14,6 +14,7 @@ interface SentenceStructureProps {
 
 const SentenceStructure: React.FC<SentenceStructureProps> = ({
   structure,
+  categoryNames,
   onRemoveCategory,
   onClearStructure,
   onDragStart,
@@ -46,7 +47,7 @@ const SentenceStructure: React.FC<SentenceStructureProps> = ({
             >
               <div className="flex items-center bg-gray-100 rounded px-3 py-1 cursor-move">
                 <GripVertical size={14} className="mr-2 text-gray-400" />
-                <span className="mr-2">{categoryNames[category as keyof typeof categoryNames]}</span>
+                <span className="mr-2">{categoryNames[category]}</span>
                 <button
                   onClick={() => onRemoveCategory(index)}
                   className="text-gray-500 hover:text-gray-700"

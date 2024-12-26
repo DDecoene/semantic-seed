@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import _ from 'lodash';
-import { wordLists, allValidWords } from '@/lib/word-lists';
+import WordListManager from '@/lib/WordListManager';
 import CategorySelector from './CategorySelector';
 import SentenceStructure from './SentenceStructure';
 import SentenceValidator from './SentenceValidator';
 
 const SentenceGenerator = () => {
+  const [wordListManager] = useState(() => WordListManager.getInstance());
   const [sentence, setSentence] = useState('');
   const [structure, setStructure] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -32,7 +33,7 @@ const SentenceGenerator = () => {
     if (structure.length === 0) return;
 
     const words = structure.map(category => {
-      const list = wordLists[category as keyof typeof wordLists];
+      const list = wordListManager.getWordsForCategory(category);
       return _.sample(list);
     });
 
@@ -46,7 +47,7 @@ const SentenceGenerator = () => {
     }
 
     const words = inputSentence.toLowerCase().trim().split(/\s+/);
-    const invalidWords = words.filter(word => !allValidWords.has(word));
+    const invalidWords = words.filter(word => !wordListManager.isValidWord(word));
 
     if (invalidWords.length === 0) {
       setValidationResult({
@@ -98,10 +99,14 @@ const SentenceGenerator = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
-            <CategorySelector onAddCategory={addCategory} />
+            <CategorySelector 
+              onAddCategory={addCategory} 
+              categories={wordListManager.getCategoryNames()}
+            />
             
             <SentenceStructure
               structure={structure}
+              categoryNames={wordListManager.getCategoryNames()}
               onRemoveCategory={removeCategory}
               onClearStructure={clearStructure}
               onDragStart={handleDragStart}
