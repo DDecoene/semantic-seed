@@ -18,7 +18,7 @@ This tool is designed to be run on an air-gapped computer for maximum security w
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/semantic-seed
+git clone https://github.com/DDecoene/semantic-seed
 cd semantic-seed
 
 # Install dependencies
