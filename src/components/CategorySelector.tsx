@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import SectionHeader from './SectionHeader';
 
 interface CategorySelectorProps {
   onAddCategory: (category: string) => void;
@@ -13,7 +14,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 }) => {
   return (
     <div className="border rounded p-4">
-      <h3 className="font-medium mb-3">Add Categories:</h3>
+      <h3 className="font-medium mb-3"><SectionHeader title="Add categories" helpKey="category"/></h3>
       <div className="flex flex-wrap gap-2">
         {Object.entries(categories).map(([key, name]) => (
           <Button

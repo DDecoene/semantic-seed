@@ -6,7 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import SectionHeader from './SectionHeader';
 
 // 12-word templates (grammatically correct sentences)
 const TEMPLATES_12 = [
@@ -94,6 +95,7 @@ const SentenceTemplate: React.FC<SentenceTemplateProps> = ({ onTemplateSelect })
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
+        <CardTitle><SectionHeader title='Template Selection' helpKey='template'/></CardTitle>
         <Select onValueChange={(value) => {
           const template = [...TEMPLATES_12, ...TEMPLATES_24].find(t => t.name === value);
           if (template) {

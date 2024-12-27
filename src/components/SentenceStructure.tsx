@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, ArrowDown, GripVertical } from 'lucide-react';
+import SectionHeader from './SectionHeader';
 
 interface SentenceStructureProps {
   structure: string[];
@@ -24,7 +25,7 @@ const SentenceStructure: React.FC<SentenceStructureProps> = ({
   return (
     <div className="border rounded p-4">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="font-medium">Current Structure:</h3>
+      <h3 className="font-medium"><SectionHeader title='Current Structure:' helpKey='structure'/></h3>
         {structure.length > 0 && (
           <Button variant="outline" size="sm" onClick={onClearStructure}>
             Clear All

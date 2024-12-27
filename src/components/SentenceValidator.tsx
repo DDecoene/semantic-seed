@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import SectionHeader from './SectionHeader';
 
 interface ValidationResult {
   isValid: boolean;
@@ -26,7 +27,7 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
-        <CardTitle>BIP39 Sentence Validator</CardTitle>
+        <CardTitle><SectionHeader title='BIP39 Sentence Validator' helpKey='validator'/></CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
