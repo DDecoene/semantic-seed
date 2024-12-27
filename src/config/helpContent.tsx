@@ -59,5 +59,20 @@ export const helpContent = {
         </ul>
       </div>
     )
+  },
+  generated: {
+    title: "Generated Sentence",
+    content: (
+      <div>
+        <p className="mb-2">View and validate your generated BIP39 sentence:</p>
+        <ul className="space-y-1">
+          <li>• Each word is randomly selected from its category</li>
+          <li>• All words are from the official BIP39 wordlist</li>
+          <li>• Click Validate to check the entire sentence</li>
+          <li>• Generate new sentences until you find one you like</li>
+          <li>• Use for cryptocurrency wallet seed phrases</li>
+        </ul>
+      </div>
+    )
   }
 };

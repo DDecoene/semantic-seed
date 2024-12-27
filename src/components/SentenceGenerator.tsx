@@ -7,6 +7,7 @@ import CategorySelector from './CategorySelector';
 import SentenceStructure from './SentenceStructure';
 import SentenceValidator from './SentenceValidator';
 import SentenceTemplate from './SentenceTemplate';
+import SectionHeader from './SectionHeader';
 
 const SentenceGenerator = () => {
   const [wordListManager] = useState(() => WordListManager.getInstance());
@@ -158,7 +159,9 @@ const SentenceGenerator = () => {
 
             {sentence && (
               <div className="border rounded p-4">
-                <h3 className="font-medium mb-2">Generated Sentence:</h3>
+                <h3 className="font-medium mb-2">
+                  <SectionHeader title='Generated Sentence' helpKey='generated' />
+                </h3>
                 <div className="flex gap-4 items-start">
                   <p className="flex-1 bg-gray-100 rounded p-4">{sentence}</p>
                   <Button onClick={handleValidateGenerated}>
