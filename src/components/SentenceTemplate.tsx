@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -6,36 +6,106 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import SectionHeader from './SectionHeader';
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import SectionHeader from "./SectionHeader";
 
 // 12-word templates (grammatically correct sentences)
 const TEMPLATES_12 = [
   {
     name: "Simple Journey",
-    structure: ["article", "adjective", "person", "action", "direction", "article", "adjective", "place", "conjunction", "timeWord", "action", "direction"],
-    example: "the brave warrior walks toward the ancient castle when night falls down"
+    structure: [
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "timeWord",
+      "action",
+      "direction",
+    ],
+    example:
+      "the brave warrior walks toward the ancient castle when night falls down",
   },
   {
     name: "Double Action",
-    structure: ["article", "adjective", "person", "action", "direction", "article", "place", "conjunction", "action", "direction", "article", "place"],
-    example: "the swift pilot flies over the mountain and glides toward the valley"
+    structure: [
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
+      "conjunction",
+      "action",
+      "direction",
+      "article",
+      "place",
+    ],
+    example:
+      "the swift pilot flies over the mountain and glides toward the valley",
   },
   {
     name: "Time Adventure",
-    structure: ["timeWord", "article", "adjective", "person", "action", "direction", "article", "place", "conjunction", "action", "article", "place"],
-    example: "tonight the brave hero runs through the forest and enters the castle"
+    structure: [
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
+      "conjunction",
+      "action",
+      "article",
+      "place",
+    ],
+    example:
+      "tonight the brave hero runs through the forest and enters the castle",
   },
   {
     name: "Place Description",
-    structure: ["article", "adjective", "place", "direction", "article", "adjective", "place", "action", "article", "person", "direction", "place"],
-    example: "the dark forest behind the ancient temple guides the warrior toward home"
+    structure: [
+      "article",
+      "adjective",
+      "place",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "action",
+      "article",
+      "person",
+      "direction",
+      "place",
+    ],
+    example:
+      "the dark forest behind the ancient temple guides the warrior toward home",
   },
   {
     name: "Double Description",
-    structure: ["article", "adjective", "adjective", "person", "action", "direction", "article", "adjective", "adjective", "place", "timeWord", "direction"],
-    example: "the brave swift teacher moves toward the dark ancient castle now forward"
-  }
+    structure: [
+      "article",
+      "adjective",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "adjective",
+      "place",
+      "timeWord",
+      "direction",
+    ],
+    example:
+      "the brave swift teacher moves toward the dark ancient castle now forward",
+  },
 ];
 
 // 24-word templates (grammatically correct sentences)
@@ -43,65 +113,183 @@ const TEMPLATES_24 = [
   {
     name: "Epic Journey",
     structure: [
-      "article", "adjective", "person", "action", "direction", "article", "adjective", "place",
-      "conjunction", "timeWord", "article", "adjective", "person", "action", "direction",
-      "article", "adjective", "place", "conjunction", "timeWord", "action", "direction", "article", "place"
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "timeWord",
+      "action",
+      "direction",
+      "article",
+      "place",
     ],
-    example: "the brave warrior walks toward the ancient castle when dawn the swift doctor flies above the dark mountain and tonight moves behind the temple"
+    example:
+      "the brave warrior walks toward the ancient castle when dawn the swift doctor flies above the dark mountain and tonight moves behind the temple",
   },
   {
     name: "Parallel Actions",
     structure: [
-      "timeWord", "article", "adjective", "person", "action", "direction", "article", "place",
-      "conjunction", "article", "adjective", "person", "action", "direction", "article",
-      "place", "conjunction", "article", "adjective", "person", "action", "direction", "article", "place"
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
+      "conjunction",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
+      "conjunction",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
     ],
-    example: "today the quick pilot flies over the ocean while the brave warrior runs through the forest and the swift doctor moves toward the castle"
+    example:
+      "today the quick pilot flies over the ocean while the brave warrior runs through the forest and the swift doctor moves toward the castle",
   },
   {
     name: "Triple Location",
     structure: [
-      "article", "adjective", "person", "action", "direction", "article", "adjective", "place",
-      "conjunction", "action", "direction", "article", "adjective", "place", "conjunction",
-      "timeWord", "action", "direction", "article", "adjective", "place", "conjunction", "article", "place"
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "timeWord",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "article",
+      "place",
     ],
-    example: "the swift hero moves through the ancient forest and flies toward the dark mountain when night glides above the huge castle near the ocean"
+    example:
+      "the swift hero moves through the ancient forest and flies toward the dark mountain when night glides above the huge castle near the ocean",
   },
   {
     name: "Time Sequence",
     structure: [
-      "timeWord", "article", "adjective", "person", "action", "direction", "article", "place",
-      "conjunction", "timeWord", "article", "adjective", "person", "action", "article",
-      "place", "conjunction", "timeWord", "article", "adjective", "person", "action", "article", "place"
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "place",
+      "conjunction",
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "article",
+      "place",
+      "conjunction",
+      "timeWord",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "article",
+      "place",
     ],
-    example: "dawn the brave warrior walks toward the castle and morning the swift pilot enters the mountain while night the quick doctor leaves the temple"
+    example:
+      "dawn the brave warrior walks toward the castle and morning the swift pilot enters the mountain while night the quick doctor leaves the temple",
   },
   {
     name: "Complex Journey",
     structure: [
-      "article", "adjective", "person", "action", "direction", "article", "adjective", "place",
-      "conjunction", "article", "adjective", "person", "action", "direction", "article",
-      "adjective", "place", "timeWord", "conjunction", "action", "direction", "article", "adjective", "place"
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "conjunction",
+      "article",
+      "adjective",
+      "person",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
+      "timeWord",
+      "conjunction",
+      "action",
+      "direction",
+      "article",
+      "adjective",
+      "place",
     ],
-    example: "the brave warrior moves through the ancient forest and the swift pilot flies over the dark mountain tonight then glides toward the huge castle"
-  }
+    example:
+      "the brave warrior moves through the ancient forest and the swift pilot flies over the dark mountain tonight then glides toward the huge castle",
+  },
 ];
 
 interface SentenceTemplateProps {
   onTemplateSelect: (structure: string[]) => void;
 }
 
-const SentenceTemplate: React.FC<SentenceTemplateProps> = ({ onTemplateSelect }) => {
+const SentenceTemplate: React.FC<SentenceTemplateProps> = ({
+  onTemplateSelect,
+}) => {
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
-        <CardTitle><SectionHeader title='Template Selection' helpKey='template'/></CardTitle>
-        <Select onValueChange={(value) => {
-          const template = [...TEMPLATES_12, ...TEMPLATES_24].find(t => t.name === value);
-          if (template) {
-            onTemplateSelect(template.structure);
-          }
-        }}>
+        <CardTitle>
+          <SectionHeader title="Template Selection" helpKey="template" />
+        </CardTitle>
+        <Select
+          onValueChange={(value) => {
+            const template = [...TEMPLATES_12, ...TEMPLATES_24].find(
+              (t) => t.name === value
+            );
+            if (template) {
+              onTemplateSelect(template.structure);
+            }
+          }}
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a sentence template..." />
           </SelectTrigger>

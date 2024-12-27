@@ -1,9 +1,9 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import SectionHeader from './SectionHeader';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import SectionHeader from "./SectionHeader";
 
 interface ValidationResult {
   isValid: boolean;
@@ -22,14 +22,14 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
   inputSentence,
   onInputChange,
   onValidate,
-  validationResult
+  validationResult,
 }) => {
   return (
-    <Card className="w-full max-w-3xl">
-      <CardHeader>
-        <CardTitle><SectionHeader title='BIP39 Sentence Validator' helpKey='validator'/></CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Card className="w-full">
+      <CardContent className="pt-6">
+        <CardTitle>
+          <SectionHeader title="BIP39 Sentence Validator" helpKey="validator" />
+        </CardTitle>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <Input
@@ -38,30 +38,33 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
               onChange={(e) => onInputChange(e.target.value)}
               className="flex-1"
             />
-            <Button onClick={onValidate}>
-              Validate
-            </Button>
+            <Button onClick={onValidate}>Validate</Button>
           </div>
 
           {validationResult && (
-            <Alert variant={validationResult.isValid ? "default" : "destructive"}>
+            <Alert
+              variant={validationResult.isValid ? "default" : "destructive"}
+            >
               <AlertTitle>
-                {validationResult.isValid ? "Valid Sentence" : "Invalid Sentence"}
+                {validationResult.isValid
+                  ? "Valid Sentence"
+                  : "Invalid Sentence"}
               </AlertTitle>
               <AlertDescription>
                 {validationResult.message}
-                {!validationResult.isValid && validationResult.invalidWords.length > 0 && (
-                  <ul className="mt-2 list-disc list-inside">
-                    {validationResult.invalidWords.map((word, index) => (
-                      <li key={index}>{word}</li>
-                    ))}
-                  </ul>
-                )}
+                {!validationResult.isValid &&
+                  validationResult.invalidWords.length > 0 && (
+                    <ul className="mt-2 list-disc list-inside">
+                      {validationResult.invalidWords.map((word, index) => (
+                        <li key={index}>{word}</li>
+                      ))}
+                    </ul>
+                  )}
               </AlertDescription>
             </Alert>
           )}
         </div>
-      </CardContent>
+        </CardContent>
     </Card>
   );
 };
