@@ -6,6 +6,7 @@ import WordListManager from '@/lib/WordListManager';
 import CategorySelector from './CategorySelector';
 import SentenceStructure from './SentenceStructure';
 import SentenceValidator from './SentenceValidator';
+import SentenceTemplate from './SentenceTemplate';
 
 const SentenceGenerator = () => {
   const [wordListManager] = useState(() => WordListManager.getInstance());
@@ -91,6 +92,11 @@ const SentenceGenerator = () => {
     setDraggedIndex(null);
   };
 
+  const handleTemplateSelect = (templateStructure: string[]) => {
+    setStructure(templateStructure);
+    setSentence(''); // Clear any previously generated sentence
+  };
+
   return (
     <div className="space-y-6">
       <Card className="w-full max-w-3xl">
@@ -103,6 +109,8 @@ const SentenceGenerator = () => {
               onAddCategory={addCategory} 
               categories={wordListManager.getCategoryNames()}
             />
+            
+            <SentenceTemplate onTemplateSelect={handleTemplateSelect} />
             
             <SentenceStructure
               structure={structure}
