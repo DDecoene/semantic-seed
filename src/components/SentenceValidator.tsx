@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import officialWordList from '@/data/officialBIP39wordlist.json';
 
 interface ValidationResult {
   isValid: boolean;
@@ -18,35 +17,12 @@ interface SentenceValidatorProps {
   validationResult: ValidationResult | null;
 }
 
-const SentenceValidator:React.FC<SentenceValidatorProps> = () => {
-  const [inputSentence, setInputSentence] = useState('');
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const officialBIP39Set = new Set(officialWordList);
-
-  const validateSentence = () => {
-    if (!inputSentence.trim()) {
-      setValidationResult(null);
-      return;
-    }
-
-    const words = inputSentence.toLowerCase().trim().split(/\s+/);
-    const invalidWords = words.filter(word => !officialBIP39Set.has(word));
-
-    if (invalidWords.length === 0) {
-      setValidationResult({
-        isValid: true,
-        message: 'All words are valid BIP39 words!',
-        invalidWords: []
-      });
-    } else {
-      setValidationResult({
-        isValid: false,
-        message: 'The following words are not in the BIP39 wordlist:',
-        invalidWords
-      });
-    }
-  };
-
+const SentenceValidator: React.FC<SentenceValidatorProps> = ({
+  inputSentence,
+  onInputChange,
+  onValidate,
+  validationResult
+}) => {
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
@@ -58,10 +34,10 @@ const SentenceValidator:React.FC<SentenceValidatorProps> = () => {
             <Input
               placeholder="Type a sentence to validate..."
               value={inputSentence}
-              onChange={(e) => setInputSentence(e.target.value)}
+              onChange={(e) => onInputChange(e.target.value)}
               className="flex-1"
             />
-            <Button onClick={validateSentence}>
+            <Button onClick={onValidate}>
               Validate
             </Button>
           </div>
@@ -69,19 +45,16 @@ const SentenceValidator:React.FC<SentenceValidatorProps> = () => {
           {validationResult && (
             <Alert variant={validationResult.isValid ? "default" : "destructive"}>
               <AlertTitle>
-                {validationResult.isValid ? "Valid BIP39 Sentence" : "Invalid BIP39 Sentence"}
+                {validationResult.isValid ? "Valid Sentence" : "Invalid Sentence"}
               </AlertTitle>
               <AlertDescription>
                 {validationResult.message}
                 {!validationResult.isValid && validationResult.invalidWords.length > 0 && (
-                  <>
-                    <ul className="mt-2 list-disc list-inside">
-                      {validationResult.invalidWords.map((word, index) => (
-                        <li key={index}>{word}</li>
-                      ))}
-                    </ul>
-                    <p className="mt-2 text-sm">All words must be from the official BIP39 wordlist.</p>
-                  </>
+                  <ul className="mt-2 list-disc list-inside">
+                    {validationResult.invalidWords.map((word, index) => (
+                      <li key={index}>{word}</li>
+                    ))}
+                  </ul>
                 )}
               </AlertDescription>
             </Alert>

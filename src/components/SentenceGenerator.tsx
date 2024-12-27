@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import _ from 'lodash';
@@ -41,7 +41,7 @@ const SentenceGenerator = () => {
     setSentence(words.join(' '));
   };
 
-  const validateSentence = () => {
+  const validateSentence = useCallback(() => {
     if (!inputSentence.trim()) {
       setValidationResult(null);
       return;
@@ -53,17 +53,17 @@ const SentenceGenerator = () => {
     if (invalidWords.length === 0) {
       setValidationResult({
         isValid: true,
-        message: 'All words are valid!',
+        message: 'All words are valid BIP39 words!',
         invalidWords: []
       });
     } else {
       setValidationResult({
         isValid: false,
-        message: 'Some words are not in the word list:',
+        message: 'Some words are not in the BIP39 wordlist:',
         invalidWords
       });
     }
-  };
+  }, [inputSentence, wordListManager]);
 
   const clearStructure = () => {
     setStructure([]);
@@ -94,7 +94,28 @@ const SentenceGenerator = () => {
 
   const handleTemplateSelect = (templateStructure: string[]) => {
     setStructure(templateStructure);
-    setSentence(''); // Clear any previously generated sentence
+    setSentence('');
+  };
+
+  const handleValidateGenerated = () => {
+    setInputSentence(sentence);
+    // Validate immediately
+    const words = sentence.toLowerCase().trim().split(/\s+/);
+    const invalidWords = words.filter(word => !wordListManager.isValidWord(word));
+
+    if (invalidWords.length === 0) {
+      setValidationResult({
+        isValid: true,
+        message: 'All words are valid BIP39 words!',
+        invalidWords: []
+      });
+    } else {
+      setValidationResult({
+        isValid: false,
+        message: 'Some words are not in the BIP39 wordlist:',
+        invalidWords
+      });
+    }
   };
 
   return (
@@ -135,7 +156,12 @@ const SentenceGenerator = () => {
             {sentence && (
               <div className="border rounded p-4">
                 <h3 className="font-medium mb-2">Generated Sentence:</h3>
-                <p className="bg-gray-100 rounded p-4">{sentence}</p>
+                <div className="flex gap-4 items-start">
+                  <p className="flex-1 bg-gray-100 rounded p-4">{sentence}</p>
+                  <Button onClick={handleValidateGenerated}>
+                    Validate
+                  </Button>
+                </div>
               </div>
             )}
           </div>
