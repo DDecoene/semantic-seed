@@ -14,6 +14,7 @@ import OnlineWalletChecker from "./OnlineWalletChecker";
 const SentenceGenerator = () => {
   const [wordListManager] = useState(() => WordListManager.getInstance());
   const [sentence, setSentence] = useState("");
+  const [validatedSentence, setValidatedSentence] = useState("");
   const [structure, setStructure] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -76,6 +77,15 @@ const SentenceGenerator = () => {
   const validateCurrentSentence = () => {
     const result = wordListManager.validateMnemonic(sentence);
     setValidationResult(result);
+    if (result.isValid) {
+      setValidatedSentence(sentence);
+    }
+  };
+
+  const handleValidationComplete = (result: ValidationResult, validatedText: string) => {
+    if (result.isValid) {
+      setValidatedSentence(validatedText);
+    }
   };
 
   return (
@@ -159,13 +169,14 @@ const SentenceGenerator = () => {
             <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
               <SentenceValidator
                 sentenceToValidate={validationResult ? sentence : undefined}
+                onValidationComplete={handleValidationComplete}
               />
             </div>
 
-            {/* Online Wallet Checker - only show if sentence is valid */}
-            {sentence && validationResult?.isValid && (
+            {/* Online Wallet Checker */}
+            {validatedSentence && (
               <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
-                <OnlineWalletChecker sentence={sentence} />
+                <OnlineWalletChecker sentence={validatedSentence} />
               </div>
             )}
           </div>

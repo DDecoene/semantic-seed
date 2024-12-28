@@ -57,23 +57,24 @@ class WordListManager {
     // Create a Set of all valid BIP39 words for efficient lookup
     this.allValidWords = new Set(officialWordList);
     
-    // Create a Set of all categorized words
-    const categorizedWords = new Set([
-      ...this.categorizedData.determiners,
-      ...this.categorizedData.adjectives.descriptive,
-      ...this.categorizedData.adjectives.quality,
-      ...this.categorizedData.nouns.people,
-      ...this.categorizedData.verbs.action,
-      ...this.categorizedData.directions,
-      ...this.categorizedData.nouns.places,
-      ...this.categorizedData.timeWords,
-      ...this.categorizedData.conjunctions
-    ]);
+    // // Create a Set of all categorized words
+    // const categorizedWords = new Set([
+    //   ...this.categorizedData.determiners,
+    //   ...this.categorizedData.adjectives.descriptive,
+    //   ...this.categorizedData.adjectives.quality,
+    //   ...this.categorizedData.nouns.people,
+    //   ...this.categorizedData.verbs.action,
+    //   ...this.categorizedData.directions,
+    //   ...this.categorizedData.nouns.places,
+    //   ...this.categorizedData.timeWords,
+    //   ...this.categorizedData.conjunctions
+    // ]);
 
-    // Check for uncategorized BIP39 words
-    const uncategorizedWords = Array.from(this.allValidWords)
-      .filter(word => !categorizedWords.has(word));
+    // // Check for uncategorized BIP39 words
+    // const uncategorizedWords = Array.from(this.allValidWords)
+    //   .filter(word => !categorizedWords.has(word));
 
+    const uncategorizedWords = this.getUncategorizedWords();
     if (uncategorizedWords.length > 0) {
       console.warn('Found uncategorized BIP39 words:', uncategorizedWords);
       console.warn(`Total uncategorized words: ${uncategorizedWords.length}`);
@@ -214,12 +215,24 @@ class WordListManager {
       };
     }
 
+    // Check for duplicate words
+    const uniqueWords = new Set(words);
+    if (uniqueWords.size !== words.length) {
+      // Find the duplicated words
+      const duplicates = words.filter((word, index) => words.indexOf(word) !== index);
+      return {
+        isValid: false,
+        message: "Seed phrase cannot contain duplicate words:",
+        invalidWords: Array.from(new Set(duplicates)) // Only show each duplicate once
+      };
+    }
+
     return {
       isValid: true,
-      message: "Valid seed phrase - all words are from the BIP39 wordlist",
+      message: "Valid seed phrase - all words are unique and from the BIP39 wordlist",
       invalidWords: []
     };
-  }
+  };
 }
 
 export default WordListManager;

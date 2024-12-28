@@ -15,7 +15,7 @@ export interface ValidationResult {
 
 interface SentenceValidatorProps {
   sentenceToValidate?: string;
-  onValidationComplete?: (result: ValidationResult) => void;
+  onValidationComplete?: (result: ValidationResult, validatedText: string) => void;
 }
 
 const SentenceValidator: React.FC<SentenceValidatorProps> = ({
@@ -27,7 +27,6 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
   const [lastValidatedSentence, setLastValidatedSentence] = useState<string | undefined>(undefined);
   const wordListManager = WordListManager.getInstance();
 
-  // wordListManager is a singleton, so we can safely exclude it from deps
   const handleValidate = useCallback((sentence?: string) => {
     const textToValidate = sentence || inputSentence;
     if (!textToValidate.trim()) {
@@ -37,9 +36,10 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
 
     const result = wordListManager.validateMnemonic(textToValidate);
     setValidationResult(result);
-    onValidationComplete?.(result);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputSentence, onValidationComplete]);
+    if (onValidationComplete) {
+      onValidationComplete(result, textToValidate);
+    }
+  }, [inputSentence, onValidationComplete, wordListManager]);
 
   useEffect(() => {
     // Only update input if we receive a new sentence to validate
