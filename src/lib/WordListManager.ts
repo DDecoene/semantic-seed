@@ -1,5 +1,6 @@
 import categorizedBIP39 from './categorizedWordlist';
 import officialWordList from '@/data/officialBIP39wordlist.json';
+import * as bip39 from "bip39";
 
 interface CategorizedWordList {
   determiners: string[];
@@ -21,6 +22,12 @@ interface CategorizedWordList {
 
 export interface CategoryWordLists {
   [key: string]: string[];
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  message: string;
+  invalidWords: string[];
 }
 
 class WordListManager {
@@ -183,6 +190,36 @@ class WordListManager {
       }
     }
     return categories;
+  }
+
+  public validateMnemonic(sentence: string): ValidationResult {
+    // Clean and split the input sentence
+    const words = sentence.toLowerCase().trim().split(/\s+/);
+    
+    // Check if all words are valid BIP39 words
+    const invalidWords = words.filter(word => !this.isValidWord(word));
+    if (invalidWords.length > 0) {
+      return {
+        isValid: false,
+        message: "Some words are not in the BIP39 wordlist:",
+        invalidWords
+      };
+    }
+
+    // Check if it's a valid BIP39 mnemonic (includes checksum validation)
+    if (!bip39.validateMnemonic(sentence)) {
+      return {
+        isValid: false,
+        message: "Invalid BIP39 mnemonic. Must be 12 or 24 words with valid checksum.",
+        invalidWords: []
+      };
+    }
+
+    return {
+      isValid: true,
+      message: "Valid BIP39 mnemonic",
+      invalidWords: []
+    };
   }
 }
 

@@ -17,6 +17,7 @@ export const helpContent = {
       </div>
     )
   },
+
   template: {
     title: "Template Selection",
     content: (
@@ -31,6 +32,7 @@ export const helpContent = {
       </div>
     )
   },
+
   structure: {
     title: "Sentence Structure",
     content: (
@@ -46,6 +48,7 @@ export const helpContent = {
       </div>
     )
   },
+
   validator: {
     title: "Sentence Validator",
     content: (
@@ -60,6 +63,7 @@ export const helpContent = {
       </div>
     )
   },
+
   generated: {
     title: "Generated Sentence",
     content: (
@@ -71,6 +75,23 @@ export const helpContent = {
           <li>• Click Validate to check the entire sentence</li>
           <li>• Generate new sentences until you find one you like</li>
           <li>• Use for cryptocurrency wallet seed phrases</li>
+        </ul>
+      </div>
+    )
+  },
+
+  walletChecker: {
+    title: "Online Wallet Checker (Security Warning)",
+    content: (
+      <div>
+        <p className="mb-2">A tool to verify wallet usage on the blockchain:</p>
+        <ul className="space-y-1">
+          <li>• Checks if addresses from your seed phrase exist on the blockchain</li>
+          <li>• ⚠️ Requires internet connection - compromises air-gap security</li>
+          <li>• ⚠️ Exposes your IP address to the Bitcoin network</li>
+          <li>• ⚠️ May leak information about your wallet</li>
+          <li>• Only use if you understand and accept these risks</li>
+          <li>• For maximum security, generate seeds on air-gapped systems</li>
         </ul>
       </div>
     )

@@ -9,6 +9,7 @@ import SentenceStructure from "./SentenceStructure";
 import SentenceValidator from "./SentenceValidator";
 import SentenceTemplate from "./SentenceTemplate";
 import SectionHeader from "./SectionHeader";
+import OnlineWalletChecker from "./OnlineWalletChecker";
 
 const SentenceGenerator = () => {
   const [wordListManager] = useState(() => WordListManager.getInstance());
@@ -208,6 +209,13 @@ const SentenceGenerator = () => {
                 validationResult={validationResult}
               />
             </div>
+
+            {/* Online Wallet Checker */}
+            {sentence && (
+              <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
+                <OnlineWalletChecker sentence={sentence} />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
