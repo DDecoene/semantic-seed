@@ -1,26 +1,45 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Wand2, Github, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Header = () => {
   const location = useLocation();
+  const version = import.meta.env.VITE_APP_VERSION || "dev";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link
-              to="/"
-              className="flex items-center gap-2 transition-opacity hover:opacity-80"
-            >
-              <img
-                src="/semantic-seed/favicon.svg"
-                alt="BIP39 Logo"
-                className="w-6 h-6"
-              />
-              <span className="font-semibold">Semantic Seed</span>
-            </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/"
+                    className="flex items-center gap-2 transition-opacity hover:opacity-80"
+                  >
+                    <img
+                      src="/semantic-seed/favicon.svg"
+                      alt="BIP39 Logo"
+                      className="w-6 h-6"
+                    />
+                    <div className="flex items-baseline">
+                      <span className="font-semibold">Semantic Seed</span>
+                      <span className="text-xs text-muted-foreground ml-1">
+                        v{version}
+                      </span>
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>Version {version}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             <nav className="hidden md:flex items-center gap-1">
               <Link to="/">
