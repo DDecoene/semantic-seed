@@ -45,10 +45,16 @@ const Header = () => {
                   Generator
                 </Button>
               </Link>
-              <Button variant="ghost" className="gap-2" size="sm">
-                <Library size={16} />
-                Docs
-              </Button>
+              <a
+                href="https://github.com/ddecoene/semantic-seed/wiki"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" className="gap-2" size="sm">
+                  <Library size={16} />
+                  <span className="hidden sm:inline">Docs</span>
+                </Button>
+              </a>
             </nav>
           </div>
 
