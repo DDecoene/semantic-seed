@@ -3,7 +3,6 @@ import * as bitcoin from "bitcoinjs-lib";
 import { BIP32Factory } from "bip32";
 import ecc from "@bitcoinerlab/secp256k1";
 import { BLOCKCHAIN_API_URL } from "@/lib/config";
-import WordListManager from "./WordListManager";
 
 bitcoin.initEccLib(ecc);
 
@@ -40,6 +39,10 @@ export interface ValidSentence {
 }
 
 export class BitcoinAddressChecker {
+  public static async validateMnemonic(phrase: string): Promise<boolean> {
+    return bip39.validateMnemonic(phrase);
+  }
+
   private static async tryWordReplacement(
     words: string[],
     index: number,
@@ -54,40 +57,38 @@ export class BitcoinAddressChecker {
   public static async findValidVariations(
     sentence: string
   ): Promise<ValidSentence[]> {
-    const wordListManager = WordListManager.getInstance();
     const words = sentence.toLowerCase().trim().split(/\s+/);
     const validVariations: ValidSentence[] = [];
 
     // Check one word replacement at a time
     for (let i = 0; i < words.length; i++) {
       const originalWord = words[i];
-      const categories = wordListManager.getCategoriesForWord(originalWord);
+      // Try replacing with similar BIP39 words
+      const similarWords = Array.from(new Set([
+        ...this.findSimilarWords(originalWord, 2)
+      ]));
 
-      for (const category of categories) {
-        const alternativeWords = wordListManager.getWordsForCategory(category);
-
-        for (const newWord of alternativeWords) {
-          if (newWord !== originalWord) {
-            try {
-              const isValid = await this.tryWordReplacement(words, i, newWord);
-              if (isValid) {
-                const newWords = [...words];
-                newWords[i] = newWord;
-                validVariations.push({
-                  sentence: newWords.join(" "),
-                  replacements: [
-                    {
-                      originalWord,
-                      newWord,
-                      category,
-                      index: i,
-                    },
-                  ],
-                });
-              }
-            } catch (error) {
-              console.error("Error trying word replacement:", error);
+      for (const newWord of similarWords) {
+        if (newWord !== originalWord) {
+          try {
+            const isValid = await this.tryWordReplacement(words, i, newWord);
+            if (isValid) {
+              const newWords = [...words];
+              newWords[i] = newWord;
+              validVariations.push({
+                sentence: newWords.join(" "),
+                replacements: [
+                  {
+                    originalWord,
+                    newWord,
+                    category: 'bip39',
+                    index: i,
+                  },
+                ],
+              });
             }
+          } catch (error) {
+            console.error("Error trying word replacement:", error);
           }
         }
       }
@@ -99,15 +100,46 @@ export class BitcoinAddressChecker {
     );
   }
 
-  /**
-   * Derives a Bitcoin address from a BIP39 mnemonic phrase
-   */
+  private static findSimilarWords(word: string, maxDistance: number): string[] {
+    const similar: string[] = [];
+    const bip39Words = bip39.wordlists.english;
+
+    for (const candidate of bip39Words) {
+      if (this.levenshteinDistance(word, candidate) <= maxDistance) {
+        similar.push(candidate);
+      }
+    }
+
+    return similar;
+  }
+
+  private static levenshteinDistance(str1: string, str2: string): number {
+    const track = Array(str2.length + 1).fill(null).map(() =>
+      Array(str1.length + 1).fill(null));
+    for (let i = 0; i <= str1.length; i += 1) {
+      track[0][i] = i;
+    }
+    for (let j = 0; j <= str2.length; j += 1) {
+      track[j][0] = j;
+    }
+    for (let j = 1; j <= str2.length; j += 1) {
+      for (let i = 1; i <= str1.length; i += 1) {
+        const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        track[j][i] = Math.min(
+          track[j][i - 1] + 1, // deletion
+          track[j - 1][i] + 1, // insertion
+          track[j - 1][i - 1] + indicator // substitution
+        );
+      }
+    }
+    return track[str2.length][str1.length];
+  }
+
   public static async deriveAddress(
     seedPhrase: string,
     accountIndex = 0,
     addressIndex = 0
   ): Promise<string> {
-    // Validate the mnemonic first
     if (!(await bip39.validateMnemonic(seedPhrase))) {
       const validVariations = await this.findValidVariations(seedPhrase);
       if (validVariations.length > 0) {
@@ -123,28 +155,18 @@ export class BitcoinAddressChecker {
             .join("\n")}`
         );
       }
-      throw new Error(
-        "Invalid BIP39 mnemonic phrase - try generating a new one"
-      );
+      throw new Error("Invalid BIP39 mnemonic phrase - try generating a new one");
     }
 
     try {
-      // Generate seed from mnemonic
       const seed = await bip39.mnemonicToSeed(seedPhrase);
-
-      // Derive the root node
       const bip32 = BIP32Factory(ecc);
       const root = bip32.fromSeed(seed);
-
-      // Derive the first account's external chain node
-      // m/44'/0'/accountIndex'/0/addressIndex
       const path = `m/44'/0'/${accountIndex}'/0/${addressIndex}`;
       const child = root.derivePath(path);
-
-      // Generate address from public key
-      const publicKeyBuffer = Buffer.from(child.publicKey);
+      const pubkeyBuffer = Buffer.from(child.publicKey);
       const { address } = bitcoin.payments.p2pkh({
-        pubkey: publicKeyBuffer,
+        pubkey: pubkeyBuffer,
       });
 
       if (!address) {
@@ -158,13 +180,6 @@ export class BitcoinAddressChecker {
     }
   }
 
-  /**
-   * Checks if a Bitcoin address has been used on the blockchain
-   * 
-   * WARNING: this does go out to the internet with the seed phrase. It's a big risk
-   *  to use this seed phrase after this in a real wallet. This key could be leaked.
-   *  This is just for fun.
-   */
   public static async checkAddress(
     address: string
   ): Promise<WalletCheckResult> {
@@ -180,7 +195,7 @@ export class BitcoinAddressChecker {
       return {
         used: data.n_tx > 0,
         address: data.address,
-        balance: (data.final_balance / 100000000).toFixed(8), // Convert satoshis to BTC
+        balance: (data.final_balance / 100000000).toFixed(8),
         txCount: data.n_tx,
         lastSeen: data.last_seen,
       };
@@ -190,9 +205,6 @@ export class BitcoinAddressChecker {
     }
   }
 
-  /**
-   * Derives an address from a seed phrase and checks its usage
-   */
   public static async checkSeedPhrase(
     seedPhrase: string
   ): Promise<WalletCheckResult> {

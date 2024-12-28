@@ -37,7 +37,8 @@ const SentenceGenerator = () => {
       return _.sample(list);
     });
 
-    setSentence(words.join(" "));
+    const newSentence = words.join(" ");
+    setSentence(newSentence);
     setValidationResult(null);
   };
 
@@ -86,6 +87,11 @@ const SentenceGenerator = () => {
     if (result.isValid) {
       setValidatedSentence(validatedText);
     }
+  };
+
+  const handleSuggestionApplied = (newSentence: string) => {
+    setSentence(newSentence);
+    setValidationResult(null);
   };
 
   return (
@@ -170,6 +176,7 @@ const SentenceGenerator = () => {
               <SentenceValidator
                 sentenceToValidate={validationResult ? sentence : undefined}
                 onValidationComplete={handleValidationComplete}
+                onSuggestionApplied={handleSuggestionApplied}
               />
             </div>
 

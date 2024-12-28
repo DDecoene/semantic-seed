@@ -138,9 +138,17 @@ const OnlineWalletChecker = ({ sentence }: OnlineWalletCheckerProps) => {
                     {result.address && (
                       <div className="mt-2">
                         <p className="font-medium">Generated Address:</p>
-                        <code className="text-sm break-all">
-                          {result.address}
-                        </code>
+                        <p className="text-sm break-all font-mono flex items-center gap-2">
+                          <a
+                            href={`https://www.blockchain.com/explorer/addresses/btc/${result.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-accent-blue hover:underline inline-flex items-center gap-1"
+                          >
+                            {result.address}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </p>
                       </div>
                     )}
                   </AlertDescription>

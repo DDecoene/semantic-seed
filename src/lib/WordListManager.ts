@@ -23,10 +23,21 @@ export interface CategoryWordLists {
   [key: string]: string[];
 }
 
+export interface WordReplacement {
+  originalWord: string;
+  newWord: string;
+  category: string;
+  index: number;
+}
+
 export interface ValidationResult {
   isValid: boolean;
   message: string;
   invalidWords: string[];
+  suggestions?: Array<{
+    sentence: string;
+    replacements: WordReplacement[];
+  }>;
 }
 
 class WordListManager {
@@ -56,23 +67,6 @@ class WordListManager {
 
     // Create a Set of all valid BIP39 words for efficient lookup
     this.allValidWords = new Set(officialWordList);
-    
-    // // Create a Set of all categorized words
-    // const categorizedWords = new Set([
-    //   ...this.categorizedData.determiners,
-    //   ...this.categorizedData.adjectives.descriptive,
-    //   ...this.categorizedData.adjectives.quality,
-    //   ...this.categorizedData.nouns.people,
-    //   ...this.categorizedData.verbs.action,
-    //   ...this.categorizedData.directions,
-    //   ...this.categorizedData.nouns.places,
-    //   ...this.categorizedData.timeWords,
-    //   ...this.categorizedData.conjunctions
-    // ]);
-
-    // // Check for uncategorized BIP39 words
-    // const uncategorizedWords = Array.from(this.allValidWords)
-    //   .filter(word => !categorizedWords.has(word));
 
     const uncategorizedWords = this.getUncategorizedWords();
     if (uncategorizedWords.length > 0) {
@@ -127,7 +121,6 @@ class WordListManager {
     return this.allValidWords.has(word.toLowerCase());
   }
 
-  // Get list of uncategorized BIP39 words
   public getUncategorizedWords(): string[] {
     const categorizedWords = new Set([
       ...this.wordLists.article,
@@ -145,7 +138,6 @@ class WordListManager {
       .sort();
   }
 
-  // Helper method to get coverage statistics
   public getCoverageStats(): {
     total: number;
     categorized: number;
@@ -165,7 +157,6 @@ class WordListManager {
     };
   }
 
-  // Helper method to validate words
   public validateWords(words: string[]): { valid: string[]; invalid: string[] } {
     const valid: string[] = [];
     const invalid: string[] = [];
@@ -181,7 +172,6 @@ class WordListManager {
     return { valid, invalid };
   }
 
-  // Get all categories that contain a specific word
   public getCategoriesForWord(word: string): string[] {
     const categories: string[] = [];
     for (const [category, words] of Object.entries(this.wordLists)) {
@@ -232,7 +222,7 @@ class WordListManager {
       message: "Valid seed phrase - all words are unique and from the BIP39 wordlist",
       invalidWords: []
     };
-  };
+  }
 }
 
 export default WordListManager;
