@@ -1,44 +1,60 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Shield } from "lucide-react";
 import SectionHeader from "./SectionHeader";
-import WordListManager, { ValidationResult } from "@/lib/WordListManager";
+import WordListManager from "@/lib/WordListManager";
 
-export interface SentenceValidatorProps {
-  initialSentence?: string;
-  onValidationResult?: (result: ValidationResult | null) => void;
+export interface ValidationResult {
+  isValid: boolean;
+  message: string;
+  invalidWords: string[];
 }
 
-const SentenceValidator: React.FC<SentenceValidatorProps> = ({ 
-  initialSentence = '',
-  onValidationResult 
+interface SentenceValidatorProps {
+  sentenceToValidate?: string;
+  onValidationComplete?: (result: ValidationResult) => void;
+}
+
+const SentenceValidator: React.FC<SentenceValidatorProps> = ({
+  sentenceToValidate,
+  onValidationComplete
 }) => {
-  const [inputSentence, setInputSentence] = useState(initialSentence);
+  const [inputSentence, setInputSentence] = useState('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [lastValidatedSentence, setLastValidatedSentence] = useState<string | undefined>(undefined);
   const wordListManager = WordListManager.getInstance();
 
-  const handleValidate = useCallback(() => {
-    if (!inputSentence.trim()) {
-      const nullResult = null;
-      setValidationResult(nullResult);
-      onValidationResult?.(nullResult);
+  // wordListManager is a singleton, so we can safely exclude it from deps
+  const handleValidate = useCallback((sentence?: string) => {
+    const textToValidate = sentence || inputSentence;
+    if (!textToValidate.trim()) {
+      setValidationResult(null);
       return;
     }
 
-    const result = wordListManager.validateMnemonic(inputSentence);
+    const result = wordListManager.validateMnemonic(textToValidate);
     setValidationResult(result);
-    onValidationResult?.(result);
-  }, [inputSentence, onValidationResult]);
+    onValidationComplete?.(result);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputSentence, onValidationComplete]);
+
+  useEffect(() => {
+    // Only update input if we receive a new sentence to validate
+    if (sentenceToValidate && sentenceToValidate !== lastValidatedSentence) {
+      setInputSentence(sentenceToValidate);
+      handleValidate(sentenceToValidate);
+      setLastValidatedSentence(sentenceToValidate);
+    }
+  }, [sentenceToValidate, handleValidate, lastValidatedSentence]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputSentence(e.target.value);
-    // Clear validation when input changes
+    const newValue = e.target.value;
+    setInputSentence(newValue);
     if (validationResult) {
       setValidationResult(null);
-      onValidationResult?.(null);
     }
   };
 
@@ -65,7 +81,7 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
               className="flex-1"
             />
             <Button 
-              onClick={handleValidate}
+              onClick={() => handleValidate()}
               className="gap-2"
               variant={validationResult?.isValid ? "default" : "secondary"}
             >
@@ -79,7 +95,7 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
               <AlertTitle>
                 {validationResult.isValid ? "Valid BIP39 Seed Phrase" : "Invalid Seed Phrase"}
               </AlertTitle>
-              <AlertDescription className="space-y-2">
+              <AlertDescription>
                 <p>{validationResult.message}</p>
                 {!validationResult.isValid && validationResult.invalidWords.length > 0 && (
                   <div className="mt-2">
@@ -90,11 +106,6 @@ const SentenceValidator: React.FC<SentenceValidatorProps> = ({
                       ))}
                     </ul>
                   </div>
-                )}
-                {validationResult.isValid && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    This is a valid BIP39 seed phrase with the correct checksum.
-                  </p>
                 )}
               </AlertDescription>
             </Alert>

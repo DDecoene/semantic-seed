@@ -1,12 +1,12 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { RefreshCw, Wand2 } from "lucide-react";
+import { RefreshCw, Wand2, CheckCircle } from "lucide-react";
 import _ from "lodash";
 import WordListManager from "@/lib/WordListManager";
 import CategorySelector from "./CategorySelector";
 import SentenceStructure from "./SentenceStructure";
-import SentenceValidator from "./SentenceValidator";
+import SentenceValidator, { ValidationResult } from "./SentenceValidator";
 import SentenceTemplate from "./SentenceTemplate";
 import SectionHeader from "./SectionHeader";
 import OnlineWalletChecker from "./OnlineWalletChecker";
@@ -16,12 +16,7 @@ const SentenceGenerator = () => {
   const [sentence, setSentence] = useState("");
   const [structure, setStructure] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [inputSentence, setInputSentence] = useState("");
-  const [validationResult, setValidationResult] = useState<{
-    isValid: boolean;
-    message: string;
-    invalidWords: string[];
-  } | null>(null);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
 
   const addCategory = (category: string) => {
     setStructure([...structure, category]);
@@ -42,37 +37,13 @@ const SentenceGenerator = () => {
     });
 
     setSentence(words.join(" "));
+    setValidationResult(null);
   };
-
-  const validateSentence = useCallback(() => {
-    if (!inputSentence.trim()) {
-      setValidationResult(null);
-      return;
-    }
-
-    const words = inputSentence.toLowerCase().trim().split(/\s+/);
-    const invalidWords = words.filter(
-      (word) => !wordListManager.isValidWord(word)
-    );
-
-    if (invalidWords.length === 0) {
-      setValidationResult({
-        isValid: true,
-        message: "All words are valid BIP39 words!",
-        invalidWords: [],
-      });
-    } else {
-      setValidationResult({
-        isValid: false,
-        message: "Some words are not in the BIP39 wordlist:",
-        invalidWords,
-      });
-    }
-  }, [inputSentence, wordListManager]);
 
   const clearStructure = () => {
     setStructure([]);
     setSentence("");
+    setValidationResult(null);
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -102,26 +73,9 @@ const SentenceGenerator = () => {
     setSentence("");
   };
 
-  const handleValidateGenerated = () => {
-    setInputSentence(sentence);
-    const words = sentence.toLowerCase().trim().split(/\s+/);
-    const invalidWords = words.filter(
-      (word) => !wordListManager.isValidWord(word)
-    );
-
-    if (invalidWords.length === 0) {
-      setValidationResult({
-        isValid: true,
-        message: "All words are valid BIP39 words!",
-        invalidWords: [],
-      });
-    } else {
-      setValidationResult({
-        isValid: false,
-        message: "Some words are not in the BIP39 wordlist:",
-        invalidWords,
-      });
-    }
+  const validateCurrentSentence = () => {
+    const result = wordListManager.validateMnemonic(sentence);
+    setValidationResult(result);
   };
 
   return (
@@ -179,22 +133,23 @@ const SentenceGenerator = () => {
               <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
                 <Card className="w-full">
                   <CardContent className="pt-6">
-                    <CardTitle>
+                    <div className="flex justify-between items-center mb-4">
                       <SectionHeader
                         title="Generated Sentence"
                         helpKey="generated"
                       />
-                    </CardTitle>
+                      <Button
+                        onClick={validateCurrentSentence}
+                        variant="outline"
+                        className="gap-2"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Validate Phrase
+                      </Button>
+                    </div>
                     <p className="bg-white/50 rounded-lg p-4 shadow-sm font-medium">
                       {sentence}
                     </p>
-
-                    <Button
-                      onClick={handleValidateGenerated}
-                      className="shrink-0"
-                    >
-                      Validate
-                    </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -203,15 +158,12 @@ const SentenceGenerator = () => {
             {/* Validator Section */}
             <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
               <SentenceValidator
-                inputSentence={inputSentence}
-                onInputChange={setInputSentence}
-                onValidate={validateSentence}
-                validationResult={validationResult}
+                sentenceToValidate={validationResult ? sentence : undefined}
               />
             </div>
 
-            {/* Online Wallet Checker */}
-            {sentence && (
+            {/* Online Wallet Checker - only show if sentence is valid */}
+            {sentence && validationResult?.isValid && (
               <div className="bg-gradient-to-br from-accent-blue/5 to-transparent rounded-lg p-6">
                 <OnlineWalletChecker sentence={sentence} />
               </div>
