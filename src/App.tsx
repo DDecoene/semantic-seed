@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SentenceGenerator from '@/components/SentenceGenerator';
 import LandingPage from '@/components/LandingPage';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             } />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );
