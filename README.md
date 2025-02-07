@@ -2,6 +2,10 @@
 
 A secure, offline-first application that generates memorable BIP39 seed phrases by creating grammatically correct sentences. This tool helps users create cryptographically valid seed phrases that are easier to memorize while maintaining the highest security standards.
 
+## 🌐 Live website
+
+- **🚀 Live**: Check it out at https://ddecoene.github.io/semantic-seed/
+
 ## 🔑 Key Features
 
 - **🔒 Air-gapped Security**: Designed to run completely offline for maximum security when generating seed phrases
